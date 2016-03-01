@@ -16,7 +16,7 @@ var shutdown map[int]chan bool
 var waiting map[int]chan bool
 var registers map[int]int
 
-func WaitForTimeout(timeout string, signals ...os.Signal) {
+func WaitForTimeout(timeout time.Duration, signals ...os.Signal) {
 	Timeout(timeout)
 	WaitFor(signals...)
 }
@@ -38,22 +38,12 @@ func WaitFor(signals ...os.Signal) {
 	sendSignals()
 }
 
-func Timeout(timeout string) {
-	var duration time.Duration
-	/* Make sure we can parse the timeout duration */
-	if d, err := time.ParseDuration(timeout); err != nil {
-		/* Bad duration, lets default to 1 minute */
-		duration = 1 * time.Minute
-	} else {
-		/* Good duration! */
-		duration = d
-	}
-
+func Timeout(timeout time.Duration) {
 	/* In Duration, register a shutdown */
 	go func(d time.Duration) {
 		<-time.After(d)
 		Now()
-	}(duration)
+	}(timeout)
 }
 
 /* Register a shutdown NOW! */
