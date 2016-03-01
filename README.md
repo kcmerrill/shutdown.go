@@ -32,14 +32,16 @@ func main() {
 
 func worker(id int) {
 	/* Wait for this worker to finish, with a high priority(the lower the number, the faster the shutdown */
-	stop := shutdown.WaitForMe(id)
+	worker := shutdown.WaitForMe(id)
 
 	/* You'd typically put this into your select {} */
-	<-stop
+	<-worker.Stop()
 
 	/* Tell the world we are ready to shutdown */
-	shutdown.Finished()
+	worker.Finished()
 }
+
+
 func DoSomethingToTriggerAShutdown() {
 	<-time.After(30 * time.Second)
 	fmt.Println("Shutdown() triggered")
